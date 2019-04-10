@@ -5,7 +5,8 @@ from model.conv_bn_relu import ConvBNRelu
 
 class Decoder(nn.Module):
     """
-    Decoder module. Receives a watermarked image and extracts the watermark. The input image may have various kinds of noise applied to it,
+    Decoder module. Receives a watermarked image and extracts the watermark.
+    The input image may have various kinds of noise applied to it,
     such as Crop, JpegCompression, and so on. See Noise layers for more.
     """
     def __init__(self, config: HiDDenConfiguration):
@@ -27,6 +28,8 @@ class Decoder(nn.Module):
 
     def forward(self, image_with_wm):
         x = self.layers(image_with_wm)
-        x.squeeze_()
+        # the output is of shape b x c x 1 x 1, and we want to squeeze out the last two dummy dimensions and make
+        # the tensor of shape b x c. If we just call squeeze_() it will also squeeze the batch dimension when b=1.
+        x.squeeze_(3).squeeze_(2)
         x = self.linear(x)
         return x

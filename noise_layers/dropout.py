@@ -6,10 +6,10 @@ class Dropout(nn.Module):
     """
     Drops random pixels from the noised image and substitues them with the pixels from the cover image
     """
-    def __init__(self, keep_ratio_min, keep_ratio_max):
+    def __init__(self, keep_ratio_range):
         super(Dropout, self).__init__()
-        self.keep_min = keep_ratio_min
-        self.keep_max = keep_ratio_max
+        self.keep_min = keep_ratio_range[0]
+        self.keep_max = keep_ratio_range[1]
 
 
     def forward(self, noised_and_cover):
@@ -24,9 +24,7 @@ class Dropout(nn.Module):
         # mask_tensor.unsqueeze_(0)
         # mask_tensor.unsqueeze_(0)
         mask_tensor = mask_tensor.expand_as(noised_image)
-        noised_and_cover =  noised_image * mask_tensor + cover_image * (1-mask_tensor)
-        return noised_and_cover
-
-
+        noised_image = noised_image * mask_tensor + cover_image * (1-mask_tensor)
+        return [noised_image, cover_image]
 
 
